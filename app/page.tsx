@@ -11,8 +11,8 @@ import ClasseTab from "@/app/pages/classe/page"
 
 export default function Home() {
   return (
-    <div className="flex justify-center w-full h-screen bg-gray-300">
-      <Tabs defaultValue="classe" className="flex flex-col w-full mt-5 sm:w-[60%]">
+    <div className="flex justify-center w-full h-full bg-gray-300 overflow-auto">
+      <Tabs defaultValue="classe" className="flex flex-col w-full mt-5 pb-20 mx-2 sm:w-[60%]">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="classe">Classe</TabsTrigger>
           <TabsTrigger value="naoagrupado">Não Agrupado</TabsTrigger>
