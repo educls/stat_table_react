@@ -1,71 +1,85 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ITable } from '@/app/interface/ITable'
 
 export default function ClasseTab() {
-  const [limiteInferior, setLimiteInferior] = useState<number>(0)
-  const [limiteSuperior, setLimiteSuperior] = useState<number>(0)
-  const [intervalo, setIntervalo] = useState<number>(0)
-  const [classes, setClasses] = useState<number>(0)
+  const [limiteInferior, setLimiteInferior] = useState<number | null>(null)
+  const [limiteSuperior, setLimiteSuperior] = useState<number | null>(null)
+  const [intervalo, setIntervalo] = useState<number | null>(null)
+  const [classes, setClasses] = useState<number | null>(null)
   const [frequencias, setFrequencias] = useState<number[]>([])
-  const [tabela, setTabela] = useState<any[]>([])
+  const [tabela, setTabela] = useState<ITable[]>([])
   const [media, setMedia] = useState<number | null>(null)
   const [desvioPadrao, setDesvioPadrao] = useState<number | null>(null)
 
   const calcularClasses = () => {
-    if (limiteInferior < limiteSuperior && intervalo > 0) {
-      const numeroClasses = Math.ceil((limiteSuperior - limiteInferior) / intervalo)
-      setClasses(numeroClasses)
-      setFrequencias(new Array(numeroClasses).fill(0))
+    if (limiteInferior === null || limiteSuperior === null || intervalo === null) {
+      alert("Preencha todos os campos corretamente.");
+      return;
     }
-  }
+    if (limiteInferior >= limiteSuperior) {
+      alert("O limite inferior deve ser menor que o superior.");
+      return;
+    }
+    if (intervalo <= 0) {
+      alert("O intervalo deve ser maior que zero.");
+      return;
+    }
+    const numeroClasses = Math.ceil((limiteSuperior - limiteInferior) / intervalo);
+    setClasses(numeroClasses);
+    setFrequencias(new Array(numeroClasses).fill(0));
+  };
 
   const calcularTabela = () => {
-    let novaTabela = []
-    let fac = 0
-    for (let i = 0; i < classes; i++) {
-      const limiteInferiorClasse = limiteInferior + i * intervalo
-      const limiteSuperiorClasse = limiteInferiorClasse + intervalo
-      const xi = (limiteInferiorClasse + limiteSuperiorClasse) / 2
-      const fi = frequencias[i] || 0
-      fac += fi
+    if (frequencias.some((freq) => freq < 0)) {
+      alert("As frequências devem ser valores não negativos.");
+      return;
+    }
+    const novaTabela: ITable[] = [];
+    let fac = 0;
+
+    for (let i = 0; i < classes!; i++) {
+      const limiteInferiorClasse = limiteInferior! + i * intervalo!;
+      const limiteSuperiorClasse = limiteInferiorClasse + intervalo!;
+      const xi = (limiteInferiorClasse + limiteSuperiorClasse) / 2;
+      const fi = frequencias[i] || 0;
+      fac += fi;
       novaTabela.push({
         classe: `${limiteInferiorClasse.toFixed(2)} - ${limiteSuperiorClasse.toFixed(2)}`,
-        xi: xi.toFixed(2),
+        xi: Number(xi.toFixed(2)),
         fi,
-        xifi: (xi * fi).toFixed(2),
-        fac
-      })
+        xifi: Number((xi * fi).toFixed(2)),
+        fac,
+      });
     }
-    setTabela(novaTabela)
+    setTabela(novaTabela);
 
-    // Calcular média
-    const somaXiFi = novaTabela.reduce((acc, row) => acc + parseFloat(row.xifi), 0)
-    const somaFi = novaTabela.reduce((acc, row) => acc + row.fi, 0)
-    const novaMedia = somaXiFi / somaFi
-    setMedia(novaMedia)
+    const somaXiFi = novaTabela.reduce((acc, row) => acc + parseFloat(row.xifi.toString()), 0);
+    const somaFi = novaTabela.reduce((acc, row) => acc + row.fi, 0);
+    const novaMedia = somaXiFi / somaFi;
+    setMedia(novaMedia);
 
-    // Calcular desvio padrão
-    const somaQuadrados = novaTabela.reduce((acc, row) => {
-      return acc + row.fi * Math.pow(parseFloat(row.xi) - novaMedia, 2)
-    }, 0)
-    const novoDesvioPadrao = Math.sqrt(somaQuadrados / somaFi)
-    setDesvioPadrao(novoDesvioPadrao)
-  }
+    const somaQuadrados = novaTabela.reduce((acc, row) => acc + row.fi * Math.pow(parseFloat(row.xi.toString()) - novaMedia, 2), 0);
+    const novoDesvioPadrao = Math.sqrt(somaQuadrados / somaFi);
+    setDesvioPadrao(novoDesvioPadrao);
+  };
 
-  const handleFrequenciaChange = (index: number, valor: number) => {
-    const novasFrequencias = [...frequencias]
-    novasFrequencias[index] = valor
-    setFrequencias(novasFrequencias)
-  }
+  const handleFrequenciaChange = (index: number, valor: string) => {
+    const numero = parseInt(valor);
+    if (isNaN(numero) || numero < 0) return;
+    const novasFrequencias = [...frequencias];
+    novasFrequencias[index] = numero;
+    setFrequencias(novasFrequencias);
+  };
 
   return (
-    <div className="flex w-full h-full mx-auto">
+    <div className="flex flex-col w-full h-full mx-auto">
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Análise Estatística</CardTitle>
@@ -78,7 +92,8 @@ export default function ClasseTab() {
               <Input
                 id="limiteInferior"
                 type="number"
-                value={limiteInferior}
+                value={limiteInferior || ''}
+                placeholder="0"
                 onChange={(e) => setLimiteInferior(Number(e.target.value))}
               />
             </div>
@@ -87,7 +102,8 @@ export default function ClasseTab() {
               <Input
                 id="limiteSuperior"
                 type="number"
-                value={limiteSuperior}
+                placeholder="0"
+                value={limiteSuperior || ''}
                 onChange={(e) => setLimiteSuperior(Number(e.target.value))}
               />
             </div>
@@ -96,7 +112,8 @@ export default function ClasseTab() {
               <Input
                 id="intervalo"
                 type="number"
-                value={intervalo}
+                placeholder="0"
+                value={intervalo || ''}
                 onChange={(e) => setIntervalo(Number(e.target.value))}
               />
             </div>
@@ -105,7 +122,7 @@ export default function ClasseTab() {
         </CardContent>
       </Card>
 
-      {classes > 0 && (
+      {classes! > 0 && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Frequências</CardTitle>
@@ -116,13 +133,13 @@ export default function ClasseTab() {
               {frequencias.map((freq, index) => (
                 <div key={index}>
                   <Label htmlFor={`freq-${index}`}>
-                    Classe {index + 1}: {(limiteInferior + index * intervalo).toFixed(2)} - {(limiteInferior + (index + 1) * intervalo).toFixed(2)}
+                    Classe {index + 1}: {(limiteInferior! + index * intervalo!).toFixed(2)} - {(limiteInferior! + (index + 1) * intervalo!).toFixed(2)}
                   </Label>
                   <Input
                     id={`freq-${index}`}
                     type="number"
-                    value={freq}
-                    onChange={(e) => handleFrequenciaChange(index, parseInt(e.target.value))}
+                    value={freq || ''}
+                    onChange={(e) => handleFrequenciaChange(index, e.target.value)}
                   />
                 </div>
               ))}
@@ -168,5 +185,5 @@ export default function ClasseTab() {
         </Card>
       )}
     </div>
-  )
+  );
 }

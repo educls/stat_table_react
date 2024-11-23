@@ -1,15 +1,16 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function NaoAgrupadosTab() {
-  const [dadosInput, setDadosInput] = useState('')
-  const [dados, setDados] = useState<number[]>([])
+  const [dadosInput, setDadosInput] = useState('');
+  const [dados, setDados] = useState<number[]>([]);
+  const [erro, setErro] = useState<string | null>(null);
   const [estatisticas, setEstatisticas] = useState<{
     media: number | null;
     mediana: number | null;
@@ -22,41 +23,50 @@ export default function NaoAgrupadosTab() {
     moda: null,
     variancia: null,
     desvioPadrao: null,
-  })
+  });
 
   const processarDados = () => {
-    const novosDados = dadosInput.split(',').map(Number).filter(n => !isNaN(n))
-    setDados(novosDados)
-    calcularEstatisticas(novosDados)
-  }
+    const novosDados = dadosInput.split(',').map(Number).filter(n => !isNaN(n));
+    if (novosDados.length === 0) {
+      setErro("Por favor, insira valores numéricos válidos separados por vírgula.");
+      return;
+    }
+    setErro(null);
+    setDados(novosDados);
+    calcularEstatisticas(novosDados);
+  };
 
   const calcularEstatisticas = (dados: number[]) => {
-    const n = dados.length
-    if (n === 0) return
+    const n = dados.length;
+    if (n === 0) return;
 
     // Média
-    const soma = dados.reduce((a, b) => a + b, 0)
-    const media = soma / n
+    const soma = dados.reduce((a, b) => a + b, 0);
+    const media = soma / n;
 
     // Mediana
-    const dadosOrdenados = [...dados].sort((a, b) => a - b)
-    const mediana = n % 2 === 0
-      ? (dadosOrdenados[n / 2 - 1] + dadosOrdenados[n / 2]) / 2
-      : dadosOrdenados[Math.floor(n / 2)]
+    const dadosOrdenados = [...dados].sort((a, b) => a - b);
+    const mediana =
+      n % 2 === 0
+        ? (dadosOrdenados[n / 2 - 1] + dadosOrdenados[n / 2]) / 2
+        : dadosOrdenados[Math.floor(n / 2)];
 
     // Moda
     const frequencias = dados.reduce((acc, val) => {
-      acc[val] = (acc[val] || 0) + 1
-      return acc
-    }, {} as Record<number, number>)
-    const maxFrequencia = Math.max(...Object.values(frequencias))
-    const moda = Object.entries(frequencias)
-      .filter(([_, freq]) => freq === maxFrequencia)
-      .map(([val, _]) => Number(val))
+      acc[val] = (acc[val] || 0) + 1;
+      return acc;
+    }, {} as Record<number, number>);
+    const maxFrequencia = Math.max(...Object.values(frequencias));
+    const moda =
+      maxFrequencia > 1
+        ? Object.entries(frequencias)
+            .filter(([freq]) => Number(freq) === maxFrequencia)
+            .map(([val]) => Number(val))
+        : [];
 
     // Variância e Desvio Padrão
-    const variancia = dados.reduce((acc, val) => acc + Math.pow(val - media, 2), 0) / n
-    const desvioPadrao = Math.sqrt(variancia)
+    const variancia = dados.reduce((acc, val) => acc + Math.pow(val - media, 2), 0) / n;
+    const desvioPadrao = Math.sqrt(variancia);
 
     setEstatisticas({
       media,
@@ -64,11 +74,11 @@ export default function NaoAgrupadosTab() {
       moda,
       variancia,
       desvioPadrao,
-    })
-  }
+    });
+  };
 
   return (
-    <div className="flex mx-auto">
+    <div className="flex flex-col w-full h-full mx-auto">
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Análise de Dados Discretos Não Agrupados</CardTitle>
@@ -86,6 +96,7 @@ export default function NaoAgrupadosTab() {
               />
             </div>
             <Button onClick={processarDados}>Calcular Estatísticas</Button>
+            {erro && <p className="text-red-500">{erro}</p>}
           </div>
         </CardContent>
       </Card>
@@ -112,7 +123,7 @@ export default function NaoAgrupadosTab() {
             <div className="space-y-2">
               <p><strong>Média:</strong> {estatisticas.media.toFixed(2)}</p>
               <p><strong>Mediana:</strong> {estatisticas.mediana?.toFixed(2)}</p>
-              <p><strong>Moda:</strong> {estatisticas.moda?.join(', ')}</p>
+              <p><strong>Moda:</strong> {estatisticas.moda?.length ? estatisticas.moda.join(', ') : 'Nenhuma moda'}</p>
               <p><strong>Variância:</strong> {estatisticas.variancia?.toFixed(2)}</p>
               <p><strong>Desvio Padrão:</strong> {estatisticas.desvioPadrao?.toFixed(2)}</p>
             </div>
@@ -120,5 +131,5 @@ export default function NaoAgrupadosTab() {
         </Card>
       )}
     </div>
-  )
+  );
 }

@@ -1,8 +1,8 @@
-import { TabsStats } from "./pages/tabs/page";
+import TabsStats from "./pages/tabs/page";
 
 export default function Home() {
   return (
-    <div className="flex justify-center w-full">
+    <div className="flex justify-center w-full h-full">
       <TabsStats />
     </div>
   );

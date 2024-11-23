@@ -1,14 +1,4 @@
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+
 import {
   Tabs,
   TabsContent,
@@ -19,9 +9,9 @@ import NaoAgrupadoTab from "../nao-agrupado/page"
 import AgrupadoTab from "../agrupado/page"
 import ClasseTab from "../classe/page"
 
-export function TabsStats() {
+export default function TabsStats() {
   return (
-    <Tabs defaultValue="classe" className="w-[400px]">
+    <Tabs defaultValue="classe" className="flex flex-col w-full mt-5 sm:w-[60%]">
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="classe">Classe</TabsTrigger>
         <TabsTrigger value="naoagrupado">Não Agrupado</TabsTrigger>

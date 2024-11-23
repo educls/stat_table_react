@@ -44,26 +44,26 @@ export default function AgrupadoTab() {
       }
       return dado
     })
-    setDados(novosDados)
-  }
 
-  const calcularEstatisticas = () => {
-    const dadosOrdenados = [...dados].sort((a, b) => a.valor - b.valor)
+    // Atualiza `fac` após modificar os dados
     let fac = 0
-    const dadosProcessados = dadosOrdenados.map(dado => {
+    const dadosComFac = novosDados.map(dado => {
       fac += dado.frequencia
       return { ...dado, fac }
     })
-    setDados(dadosProcessados)
 
-    const n = dadosProcessados.reduce((sum, dado) => sum + dado.frequencia, 0)
-    const soma = dadosProcessados.reduce((sum, dado) => sum + dado.xifi, 0)
+    setDados(dadosComFac)
+  }
+
+  const calcularEstatisticas = () => {
+    const n = dados.reduce((sum, dado) => sum + dado.frequencia, 0)
+    const soma = dados.reduce((sum, dado) => sum + dado.xifi, 0)
     const media = soma / n
 
-    const mediana = calcularMediana(dadosProcessados, n)
-    const moda = calcularModa(dadosProcessados)
+    const mediana = calcularMediana(dados, n)
+    const moda = calcularModa(dados)
 
-    const variancia = dadosProcessados.reduce((acc, dado) =>
+    const variancia = dados.reduce((acc, dado) =>
       acc + dado.frequencia * Math.pow(dado.valor - media, 2), 0) / n
     const desvioPadrao = Math.sqrt(variancia)
 
@@ -79,13 +79,10 @@ export default function AgrupadoTab() {
   const calcularMediana = (dadosProcessados: DadoDiscreto[], n: number): number => {
     const meioN = n / 2
     let soma = 0
-    for (let dado of dadosProcessados) {
+    for (const dado of dadosProcessados) {
       soma += dado.frequencia
-      if (soma > meioN) {
+      if (soma >= meioN) {
         return dado.valor
-      } else if (soma === meioN) {
-        const proximoDado = dadosProcessados[dadosProcessados.indexOf(dado) + 1]
-        return (dado.valor + proximoDado.valor) / 2
       }
     }
     return 0
@@ -97,7 +94,7 @@ export default function AgrupadoTab() {
   }
 
   return (
-    <div className="flex mx-auto">
+    <div className="flex flex-col w-full h-full mx-auto">
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Análise de Dados Discretos</CardTitle>
@@ -112,12 +109,14 @@ export default function AgrupadoTab() {
                 <React.Fragment key={index}>
                   <Input
                     type="number"
-                    value={dado.valor}
+                    value={dado.valor || ''}
+                    placeholder='0'
                     onChange={(e) => atualizarDado(index, 'valor', Number(e.target.value))}
                   />
                   <Input
                     type="number"
-                    value={dado.frequencia}
+                    value={dado.frequencia || ''}
+                    placeholder='0'
                     onChange={(e) => atualizarDado(index, 'frequencia', Number(e.target.value))}
                   />
                 </React.Fragment>
@@ -131,7 +130,7 @@ export default function AgrupadoTab() {
         </CardContent>
       </Card>
 
-      {dados.length > 0 && dados[0].fac > 0 && (
+      {dados.length > 0 && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Tabela de Frequências</CardTitle>
