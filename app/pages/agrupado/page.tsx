@@ -56,42 +56,60 @@ export default function AgrupadoTab() {
   }
 
   const calcularEstatisticas = () => {
-    const n = dados.reduce((sum, dado) => sum + dado.frequencia, 0)
-    const soma = dados.reduce((sum, dado) => sum + dado.xifi, 0)
-    const media = soma / n
+    // Calcula o total de frequências (n) e a soma ponderada (∑(xi * fi))
+    const n = dados.reduce((sum, dado) => sum + dado.frequencia, 0);
+    const soma = dados.reduce((sum, dado) => sum + dado.xifi, 0);
 
-    const mediana = calcularMediana(dados, n)
-    const moda = calcularModa(dados)
+    // Calcula a média (x̄)
+    const media = soma / n;
 
-    const variancia = dados.reduce((acc, dado) =>
-      acc + dado.frequencia * Math.pow(dado.valor - media, 2), 0) / n
-    const desvioPadrao = Math.sqrt(variancia)
+    // Ordena os dados antes de calcular a mediana
+    const dadosOrdenados = [...dados].sort((a, b) => a.valor - b.valor);
 
+    // Calcula a mediana
+    const mediana = calcularMediana(dadosOrdenados, n);
+
+    // Calcula a moda
+    const moda = calcularModa(dados);
+
+    // Calcula a variância: ∑(fi * (xi - x̄)^2) / n
+    const variancia = dados.reduce(
+      (acc, dado) => acc + dado.frequencia * Math.pow(dado.valor - media, 2),
+      0
+    ) / n;
+
+    // Calcula o desvio padrão: √variância
+    const desvioPadrao = Math.sqrt(variancia);
+
+    // Atualiza as estatísticas calculadas
     setEstatisticas({
       media,
       mediana,
       moda,
       variancia,
       desvioPadrao,
-    })
-  }
+    });
+  };
 
-  const calcularMediana = (dadosProcessados: DadoDiscreto[], n: number): number => {
-    const meioN = n / 2
-    let soma = 0
+  const calcularMediana = (dadosProcessados: any, n: any) => {
+    const meioN = n / 2;
+    let soma = 0;
+
     for (const dado of dadosProcessados) {
-      soma += dado.frequencia
+      soma += dado.frequencia;
       if (soma >= meioN) {
-        return dado.valor
+        return dado.valor; // Retorna o valor correspondente ao meio
       }
     }
-    return 0
-  }
+    return 0; // Caso não encontre (não deve ocorrer)
+  };
 
-  const calcularModa = (dadosProcessados: DadoDiscreto[]): number[] => {
-    const maxFrequencia = Math.max(...dadosProcessados.map(d => d.frequencia))
-    return dadosProcessados.filter(d => d.frequencia === maxFrequencia).map(d => d.valor)
-  }
+  const calcularModa = (dadosProcessados: any) => {
+    const maxFrequencia = Math.max(...dadosProcessados.map((d: any) => d.frequencia));
+    return dadosProcessados
+      .filter((d: any) => d.frequencia === maxFrequencia)
+      .map((d: any) => d.valor);
+  };
 
   return (
     <div className="flex flex-col w-full h-full mx-auto">

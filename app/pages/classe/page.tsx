@@ -8,6 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ITable } from '@/app/interface/ITable'
 
+
+
 export default function ClasseTab() {
   const [limiteInferior, setLimiteInferior] = useState<number | null>(null)
   const [limiteSuperior, setLimiteSuperior] = useState<number | null>(null)
@@ -17,6 +19,7 @@ export default function ClasseTab() {
   const [tabela, setTabela] = useState<ITable[]>([])
   const [media, setMedia] = useState<number | null>(null)
   const [desvioPadrao, setDesvioPadrao] = useState<number | null>(null)
+
 
   const calcularClasses = () => {
     if (limiteInferior === null || limiteSuperior === null || intervalo === null) {
@@ -35,41 +38,63 @@ export default function ClasseTab() {
     setClasses(numeroClasses);
     setFrequencias(new Array(numeroClasses).fill(0));
   };
-
+  
   const calcularTabela = () => {
     if (frequencias.some((freq) => freq < 0)) {
       alert("As frequências devem ser valores não negativos.");
       return;
     }
+  
+    const somaFi = frequencias.reduce((acc, fi) => acc + fi, 0);
+    if (somaFi === 0) {
+      alert("A soma das frequências não pode ser zero.");
+      return;
+    }
+  
     const novaTabela: ITable[] = [];
     let fac = 0;
-
+  
+    // Cálculo de média (Xi * fi)
+    let somaXiFi = 0;
+    const xiArray: number[] = []; // Armazenar xi para cálculo do desvio
     for (let i = 0; i < classes!; i++) {
       const limiteInferiorClasse = limiteInferior! + i * intervalo!;
       const limiteSuperiorClasse = limiteInferiorClasse + intervalo!;
       const xi = (limiteInferiorClasse + limiteSuperiorClasse) / 2;
+      xiArray.push(xi);
+      const fi = frequencias[i] || 0;
+      somaXiFi += xi * fi;
+    }
+    const novaMedia = somaXiFi / somaFi;
+    setMedia(novaMedia);
+  
+    // Preenchendo a tabela
+    for (let i = 0; i < classes!; i++) {
+      const limiteInferiorClasse = limiteInferior! + i * intervalo!;
+      const limiteSuperiorClasse = limiteInferiorClasse + intervalo!;
+      const xi = xiArray[i];
       const fi = frequencias[i] || 0;
       fac += fi;
+      const desvioQuadraticoFi = Number((fi * Math.pow(xi - novaMedia, 2)).toFixed(2));
       novaTabela.push({
         classe: `${limiteInferiorClasse.toFixed(2)} - ${limiteSuperiorClasse.toFixed(2)}`,
         xi: Number(xi.toFixed(2)),
         fi,
         xifi: Number((xi * fi).toFixed(2)),
         fac,
+        desvioQuadraticoFi,
       });
     }
+  
     setTabela(novaTabela);
-
-    const somaXiFi = novaTabela.reduce((acc, row) => acc + parseFloat(row.xifi.toString()), 0);
-    const somaFi = novaTabela.reduce((acc, row) => acc + row.fi, 0);
-    const novaMedia = somaXiFi / somaFi;
-    setMedia(novaMedia);
-
-    const somaQuadrados = novaTabela.reduce((acc, row) => acc + row.fi * Math.pow(parseFloat(row.xi.toString()) - novaMedia, 2), 0);
+  
+    // Cálculo do desvio padrão
+    const somaQuadrados = novaTabela.reduce((acc, row) => acc + row.desvioQuadraticoFi!, 0);
     const novoDesvioPadrao = Math.sqrt(somaQuadrados / somaFi);
     setDesvioPadrao(novoDesvioPadrao);
   };
-
+  
+  
   const handleFrequenciaChange = (index: number, valor: string) => {
     const numero = parseInt(valor);
     if (isNaN(numero) || numero < 0) return;
@@ -163,6 +188,7 @@ export default function ClasseTab() {
                   <TableHead>fi</TableHead>
                   <TableHead>Xi * fi</TableHead>
                   <TableHead>fac</TableHead>
+                  <TableHead>(Xi - Média)² * fi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -173,6 +199,7 @@ export default function ClasseTab() {
                     <TableCell>{row.fi}</TableCell>
                     <TableCell>{row.xifi}</TableCell>
                     <TableCell>{row.fac}</TableCell>
+                    <TableCell>{row.desvioQuadraticoFi?.toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

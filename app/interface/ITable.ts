@@ -6,4 +6,5 @@ export interface ITable {
   fi: number;
   xifi: number;
   fac: number;
+  desvioQuadraticoFi?: number;
 }
