@@ -107,7 +107,7 @@ export default function ClasseTab() {
     <div className="flex flex-col w-full h-full mx-auto">
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Análise Estatística</CardTitle>
+          <CardTitle>Calculo com Intervalo de Classes</CardTitle>
           <CardDescription>Insira os limites e o intervalo das classes</CardDescription>
         </CardHeader>
         <CardContent>

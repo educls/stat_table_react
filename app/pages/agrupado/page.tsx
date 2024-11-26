@@ -115,7 +115,7 @@ export default function AgrupadoTab() {
     <div className="flex flex-col w-full h-full mx-auto">
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Análise de Dados Discretos Agrupados</CardTitle>
+          <CardTitle>Dados Discretos Agrupados</CardTitle>
           <CardDescription>Insira os valores e suas frequências</CardDescription>
         </CardHeader>
         <CardContent>

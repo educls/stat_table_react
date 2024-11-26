@@ -60,8 +60,8 @@ export default function NaoAgrupadosTab() {
     const moda =
       maxFrequencia > 1
         ? Object.entries(frequencias)
-            .filter(([freq]) => Number(freq) === maxFrequencia)
-            .map(([val]) => Number(val))
+          .filter(([_, freq]) => freq === maxFrequencia) // Corrigido aqui: comparando a frequência e não o valor da chave
+          .map(([val]) => Number(val))
         : [];
 
     // Variância e Desvio Padrão
@@ -81,7 +81,7 @@ export default function NaoAgrupadosTab() {
     <div className="flex flex-col w-full h-full mx-auto">
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Análise de Dados Discretos Não Agrupados</CardTitle>
+          <CardTitle>Dados Discretos Não Agrupados</CardTitle>
           <CardDescription>Insira os dados separados por vírgula</CardDescription>
         </CardHeader>
         <CardContent>
@@ -95,7 +95,7 @@ export default function NaoAgrupadosTab() {
                 placeholder="Ex: 1,2,2,3,4,4,4,5"
               />
             </div>
-            <Button onClick={processarDados}>Calcular Estatísticas</Button>
+            <Button onClick={processarDados}>Calcular</Button>
             {erro && <p className="text-red-500">{erro}</p>}
           </div>
         </CardContent>
