@@ -60,7 +60,7 @@ export default function NaoAgrupadosTab() {
     const moda =
       maxFrequencia > 1
         ? Object.entries(frequencias)
-          .filter(([_, freq]) => freq === maxFrequencia) // Corrigido aqui: comparando a frequência e não o valor da chave
+          .filter(([, freq]) => freq === maxFrequencia) // Corrigido aqui: comparando a frequência e não o valor da chave
           .map(([val]) => Number(val))
         : [];
 

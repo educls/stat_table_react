@@ -13,10 +13,10 @@ type DadoDiscreto = {
   frequencia: number;
   xifi: number;
   fac: number;
-}
+};
 
 export default function AgrupadoTab() {
-  const [dados, setDados] = useState<DadoDiscreto[]>([{ valor: 0, frequencia: 0, xifi: 0, fac: 0 }])
+  const [dados, setDados] = useState<DadoDiscreto[]>([{ valor: 0, frequencia: 0, xifi: 0, fac: 0 }]);
   const [estatisticas, setEstatisticas] = useState<{
     media: number | null;
     mediana: number | null;
@@ -29,31 +29,31 @@ export default function AgrupadoTab() {
     moda: null,
     variancia: null,
     desvioPadrao: null,
-  })
+  });
 
   const adicionarLinha = () => {
-    setDados([...dados, { valor: 0, frequencia: 0, xifi: 0, fac: 0 }])
-  }
+    setDados([...dados, { valor: 0, frequencia: 0, xifi: 0, fac: 0 }]);
+  };
 
   const atualizarDado = (index: number, campo: keyof DadoDiscreto, valor: number) => {
     const novosDados = dados.map((dado, i) => {
       if (i === index) {
-        const novoDado = { ...dado, [campo]: valor }
-        novoDado.xifi = novoDado.valor * novoDado.frequencia
-        return novoDado
+        const novoDado = { ...dado, [campo]: valor };
+        novoDado.xifi = novoDado.valor * novoDado.frequencia;
+        return novoDado;
       }
-      return dado
-    })
+      return dado;
+    });
 
     // Atualiza `fac` após modificar os dados
-    let fac = 0
-    const dadosComFac = novosDados.map(dado => {
-      fac += dado.frequencia
-      return { ...dado, fac }
-    })
+    let fac = 0;
+    const dadosComFac = novosDados.map((dado) => {
+      fac += dado.frequencia;
+      return { ...dado, fac };
+    });
 
-    setDados(dadosComFac)
-  }
+    setDados(dadosComFac);
+  };
 
   const calcularEstatisticas = () => {
     // Calcula o total de frequências (n) e a soma ponderada (∑(xi * fi))
@@ -91,7 +91,8 @@ export default function AgrupadoTab() {
     });
   };
 
-  const calcularMediana = (dadosProcessados: any, n: any) => {
+  // Ajuste nos tipos da função calcularMediana
+  const calcularMediana = (dadosProcessados: DadoDiscreto[], n: number): number => {
     const meioN = n / 2;
     let soma = 0;
 
@@ -104,11 +105,12 @@ export default function AgrupadoTab() {
     return 0; // Caso não encontre (não deve ocorrer)
   };
 
-  const calcularModa = (dadosProcessados: any) => {
-    const maxFrequencia = Math.max(...dadosProcessados.map((d: any) => d.frequencia));
+  // Ajuste nos tipos da função calcularModa
+  const calcularModa = (dadosProcessados: DadoDiscreto[]): number[] => {
+    const maxFrequencia = Math.max(...dadosProcessados.map((d) => d.frequencia));
     return dadosProcessados
-      .filter((d: any) => d.frequencia === maxFrequencia)
-      .map((d: any) => d.valor);
+      .filter((d) => d.frequencia === maxFrequencia)
+      .map((d) => d.valor);
   };
 
   return (
