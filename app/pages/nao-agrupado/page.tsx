@@ -65,7 +65,7 @@ export default function NaoAgrupadosTab() {
         : [];
 
     // Variância e Desvio Padrão
-    const variancia = dados.reduce((acc, val) => acc + Math.pow(val - media, 2), 0) / n;
+    const variancia = dados.reduce((acc, val) => acc + Math.pow(val - media, 2), 0) / n - 1;
     const desvioPadrao = Math.sqrt(variancia);
 
     setEstatisticas({

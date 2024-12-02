@@ -76,7 +76,7 @@ export default function AgrupadoTab() {
     const variancia = dados.reduce(
       (acc, dado) => acc + dado.frequencia * Math.pow(dado.valor - media, 2),
       0
-    ) / n;
+    ) / n - 1;
 
     // Calcula o desvio padrão: √variância
     const desvioPadrao = Math.sqrt(variancia);
